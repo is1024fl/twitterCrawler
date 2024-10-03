@@ -99,5 +99,5 @@ if __name__ == "__main__":
 
 	crawler = twitterCrawler()
 	crawler.login()
-	crawler.parseTweet("https://x.com/warhound_yin/status/1743210738343383401?s=46&t=eJ927GR7M0k-wGZVswk43w")
+	crawler.parseTweet("XXXXX")
 	crawler.quit()
