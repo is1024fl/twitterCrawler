@@ -10,7 +10,7 @@ import time
 import json
 from pathlib import Path
 
-class TwitterCrawler:
+class twitterCrawler:
 
 	LOGIN_PAGE = "https://twitter.com/i/flow/login"
 	PAUSE_TIME = 3
@@ -47,7 +47,7 @@ class TwitterCrawler:
 		password_input.send_keys(Keys.RETURN)
 		time.sleep(self.PAUSE_TIME)
 
-	def parse_tweet(self, tweet_url, save=True):
+	def parseTweet(self, tweet_url, save_json=True):
 		self.driver.get(tweet_url)
 		WebDriverWait(self.driver, 30).until(EC.presence_of_element_located((By.TAG_NAME, 'article')))
 		time.sleep(self.PAUSE_TIME)
@@ -55,12 +55,13 @@ class TwitterCrawler:
 		infos = []
 		last_height = self.driver.execute_script("return document.body.scrollHeight")
 		while True:
-			infos += self.get_tweet()
+			infos += self.getTweet()
 			self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
 			more_reply = self.driver.find_elements(By.XPATH, "//*[contains(text(), '顯示更多回覆')]")
 			if more_reply:
 				more_reply[0].click()
+				infos += self.getTweet()
 			time.sleep(self.PAUSE_TIME)
 			
 			new_height = self.driver.execute_script("return document.body.scrollHeight")
@@ -68,10 +69,14 @@ class TwitterCrawler:
 				break
 			last_height = new_height
 
+		if save_json:
+			with open("info.json", "w", encoding="utf-8") as f:
+				json.dump(infos, f)
+
 		return infos
 
 
-	def get_tweet(self):
+	def getTweet(self):
 
 		info = []
 		for elem in self.driver.find_elements(By.XPATH, "//*[@data-testid='tweet']"):
@@ -88,14 +93,11 @@ class TwitterCrawler:
 			
 			info.append({'name': user[0], 'account': user[1], 'date': date, 'content': content})
 		
-		with open("info.json", "w", encoding="utf-8") as f:
-			json.dump(info, f)
-		
-		return 
+		return info
 
 if __name__ == "__main__":
 
-	crawler = TwitterCrawler()
+	crawler = twitterCrawler()
 	crawler.login()
-	crawler.parse_tweet("https://x.com/warhound_yin/status/1743210738343383401?s=46&t=eJ927GR7M0k-wGZVswk43w")
+	crawler.parseTweet("https://x.com/warhound_yin/status/1743210738343383401?s=46&t=eJ927GR7M0k-wGZVswk43w")
 	crawler.quit()
