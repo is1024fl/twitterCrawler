@@ -127,5 +127,5 @@ if __name__ == "__main__":
 
 	crawler = twitterCrawler()
 	crawler.login()
-	crawler.parseTweet("https://x.com/yotta_zzz/media", "img")
+	crawler.parseTweet("XXXXXX", "img")
 	crawler.quit()
